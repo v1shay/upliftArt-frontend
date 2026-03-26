@@ -12,7 +12,7 @@ import img4557 from '../assets/cards6.jpeg';
 import img4559 from '../assets/cards7.jpeg';
 import img4563 from '../assets/cards8.jpeg';
 import img4565 from '../assets/cards9.jpeg';
-import img5527 from '../assets/cards10.jpeg';
+import img5527 from '../assets/cards10.jpg';
 import img2222 from '../assets/photo.jpeg'
 
 /* ─── Animation Presets ─────────────────────────────────────── */
