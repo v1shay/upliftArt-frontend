@@ -4,7 +4,7 @@ import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 export const ShaderBackground: React.FC = () => {
   return (
     <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden">
-      <Suspense fallback={<div className="w-full h-full bg-[#0a0a0a]" />}>
+      <Suspense fallback={<div className="w-full h-full bg-[#fffdfa]" />}>
         <ShaderGradientCanvas
           style={{
             position: 'absolute',
@@ -19,7 +19,6 @@ export const ShaderBackground: React.FC = () => {
         >
           <ShaderGradient
             animate="on"
-            axesHelper="off"
             brightness={1.3}
             cAzimuthAngle={0}
             cDistance={7.1}
@@ -28,23 +27,9 @@ export const ShaderBackground: React.FC = () => {
             color1="#ffffff"
             color2="#940000"
             color3="#fffdfa"
-            destination="onCanvas"
-            embedMode="off"
-            envPreset="city"
-            format="gif"
-            fov={45}
-            frameRate={10}
-            gizmoHelper="hide"
-            grain="off"
-            lightType="3d"
-            pixelDensity={1}
             positionX={0}
             positionY={0}
             positionZ={0}
-            range="disabled"
-            rangeEnd={40}
-            rangeStart={0}
-            reflection={0.1}
             rotationX={0}
             rotationY={0}
             rotationZ={0}
@@ -56,11 +41,11 @@ export const ShaderBackground: React.FC = () => {
             uSpeed={0.1}
             uStrength={1}
             uTime={0}
-            wireframe={false}
           />
         </ShaderGradientCanvas>
       </Suspense>
-      <div className="absolute inset-0 bg-black/10 pointer-events-none" />
+      {/* Subtle overlay to blend shader with the ivory editorial theme */}
+      <div className="absolute inset-0 bg-ivory/20 pointer-events-none" />
     </div>
   );
 };
