@@ -1,7 +1,17 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import logo from '../assets/logo.png';
+import logo from '../assets/image.png';
 import { Mission, Impact, Cards, Contact } from './BlankPages';
+
+// Partner Logos
+import school1 from '../assets/logos/image.png';
+import school2 from '../assets/logos/download-removebg-preview (1).png';
+import school3 from '../assets/logos/download-removebg-preview.png';
+import school4 from '../assets/logos/download__1_-removebg-preview.png';
+import school5 from '../assets/logos/download__2_-removebg-preview.png';
+import school6 from '../assets/logos/image copy.png';
+import school7 from '../assets/logos/download__4_-removebg-preview.png';
+import school8 from '../assets/logos/miller_logo_2022-removebg-preview.png';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40, rotateX: 15 },
@@ -63,6 +73,65 @@ const StatItem: React.FC<{
   </motion.div>
 );
 
+/* ─── Circular Logo Orbit ───────────────────────────────────── */
+
+const LogoOrbit: React.FC<{ progress: any }> = ({ progress }) => {
+  // All partners at 100% visibility, no tint or fading
+  const PARTNERS = [
+    { src: school1, opacity: 1.0 },
+    { src: school2, opacity: 1.0 },
+    { src: school3, opacity: 1.0 },
+    { src: school4, opacity: 1.0 },
+    { src: school5, opacity: 1.0 },
+    { src: school6, opacity: 1.0 },
+    { src: school7, opacity: 1.0 },
+    { src: school8, opacity: 1.0 },
+  ];
+
+  // Create a base rotation that combines auto-rotation with scroll parallax
+  const rotation = useTransform(progress, [0, 1], [0, 90]);
+
+  return (
+    <motion.div
+      style={{ rotate: rotation }}
+      className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10 transform-gpu preserve-3d"
+    >
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
+        className="relative w-[600px] h-[600px] flex items-center justify-center -translate-y-8"
+      >
+        {PARTNERS.map((partner, i) => {
+          const angle = (i / PARTNERS.length) * 2 * Math.PI;
+          const radius = 280;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-16 h-16 flex items-center justify-center"
+              style={{ x, y }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: partner.opacity,
+                scale: 1,
+              }}
+              transition={{ delay: 1.2 + i * 0.1, duration: 1.5, ease: "easeOut" }}
+            >
+              <img
+                src={partner.src}
+                alt="Partner School Logo"
+                className="w-full h-auto object-contain transition-all duration-700"
+              />
+            </motion.div>
+          );
+        })}
+      </motion.div>
+    </motion.div>
+  );
+};
+
 export const Home: React.FC = () => {
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -82,7 +151,7 @@ export const Home: React.FC = () => {
 
   const titleY = useTransform(smoothProgress, [0, 1], [0, -60]);
   const titleRotateX = useTransform(smoothProgress, [0, 1], [0, 10]);
-  
+
   const statsY = useTransform(smoothProgress, [0, 1], [0, -30]);
   const statsRotateX = useTransform(smoothProgress, [0, 1], [0, 8]);
 
@@ -115,10 +184,13 @@ export const Home: React.FC = () => {
           }}
           className="relative z-10 flex flex-col items-center transform-gpu preserve-3d"
         >
+          {/* Circular Logo Orbit behind main logo */}
+          <LogoOrbit progress={smoothProgress} />
+
           <motion.img
             src={logo}
             alt="UpliftArt Foundation"
-            className="w-full max-w-[850px] h-auto mb-16 drop-shadow-[0_0_80px_rgba(74,14,14,0.12)] transform-gpu"
+            className="w-full max-w-[850px] h-auto mb-16 drop-shadow-[0_0_80px_rgba(74,14,14,0.12)] transform-gpu relative z-10"
             initial={{ scale: 0.85, opacity: 0, rotateY: -8 }}
             animate={{ scale: 1, opacity: 1, rotateY: 0 }}
             transition={{ duration: 2.8, ease: [0.23, 1, 0.32, 1] }}
