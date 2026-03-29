@@ -3,8 +3,8 @@ import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 
 export const ShaderBackground: React.FC = () => {
   return (
-    <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden bg-[#fffdfa]">
-      <Suspense fallback={<div className="w-full h-full bg-[#fffdfa]" />}>
+    <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden bg-[#c4b7a6]">
+      <Suspense fallback={<div className="w-full h-full bg-[#c4b7a6]" />}>
         <ShaderGradientCanvas
           style={{
             position: 'absolute',
@@ -23,7 +23,7 @@ export const ShaderBackground: React.FC = () => {
             cAzimuthAngle={0}
             cDistance={4}
             cPolarAngle={110}
-            cameraZoom={14.2}
+            cameraZoom={1} // Zoomed to fill the entire frame
             color1="#d9d4cc"
             color2="#c4b7a6"
             color3="#beb5a8"
@@ -34,8 +34,8 @@ export const ShaderBackground: React.FC = () => {
             rotationY={0}
             rotationZ={0}
             shader="defaults"
-            type="sphere"
-            uAmplitude={1.4}
+            type="plane" // Switched to plane to prevent geometry cutoffs in corners
+            uAmplitude={1.2}
             uDensity={1.2}
             uFrequency={5.5}
             uSpeed={0.12}
