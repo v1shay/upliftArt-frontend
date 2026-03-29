@@ -24,9 +24,9 @@ export const ShaderBackground: React.FC = () => {
             cDistance={4}
             cPolarAngle={110}
             cameraZoom={14.2}
-            color1="#d9d4cc" // Muted Stone
-            color2="#c4b7a6" // Darkened Creme
-            color3="#beb5a8" // Deep Taupe
+            color1="#d9d4cc"
+            color2="#c4b7a6"
+            color3="#beb5a8"
             positionX={0}
             positionY={0}
             positionZ={0}
