@@ -1,18 +1,58 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import logo from '../../assets/logo.png';
 
 const NAV_LINKS = [
-  { name: 'Home', path: '/' },
-  { name: 'Mission', path: '/mission' },
-  { name: 'Cards', path: '/cards' },
-  { name: 'Impact', path: '/impact' },
-  { name: 'Contact', path: '/contact' },
+  { name: 'Home', id: 'home' },
+  { name: 'Mission', id: 'mission' },
+  { name: 'Cards', id: 'cards' },
+  { name: 'Impact', id: 'impact' },
+  { name: 'Contact', id: 'contact' },
 ];
 
 export const Navbar: React.FC = () => {
+  const [activeSection, setActiveSection] = useState('home');
+
+  useEffect(() => {
+    let ticking = false;
+
+    const updateActiveSection = () => {
+      const scrollPosition = window.scrollY + 200;
+      const sections = NAV_LINKS.map(link => document.getElementById(link.id));
+      
+      for (const section of sections) {
+        if (!section) continue;
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+
+        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+          setActiveSection(section.id);
+          break;
+        }
+      }
+      
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateActiveSection);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
@@ -22,7 +62,10 @@ export const Navbar: React.FC = () => {
     >
       <div className="flex items-center justify-between h-20 px-12 max-w-7xl mx-auto">
         {/* Logo */}
-        <NavLink to="/" className="flex items-center gap-3 group">
+        <button 
+          onClick={() => scrollToSection('home')}
+          className="flex items-center gap-3 group focus:outline-none"
+        >
           <motion.img
             src={logo}
             alt="UpliftArt"
@@ -30,47 +73,44 @@ export const Navbar: React.FC = () => {
             whileHover={{ scale: 1.08 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
           />
-          <span className="text-[10px] font-sans font-semibold tracking-[0.3em] uppercase text-glass-creme-text/70 group-hover:text-glass-creme-text transition-colors duration-500 hidden sm:block">
+          <span className="text-[10px] font-sans font-semibold tracking-[0.3em] uppercase text-glass-creme-text/70 group-hover:text-glass-creme-text transition-colors duration-500 hidden sm:block text-left">
             UpliftArt Foundation
           </span>
-        </NavLink>
+        </button>
 
         {/* Navigation Links */}
         <div className="flex items-center gap-8 md:gap-12">
-          {NAV_LINKS.map((link, i) => (
-            <motion.div
-              key={link.path}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 + i * 0.1, duration: 0.6 }}
-            >
-              <NavLink
-                to={link.path}
-                className={({ isActive }) =>
-                  cn(
-                    "relative py-2 text-[10px] font-sans font-semibold tracking-[0.2em] uppercase transition-all duration-500 group",
-                    isActive ? "text-glass-creme-text" : "text-glass-ivory-text/40 hover:text-glass-creme-text/80"
-                  )
-                }
+          {NAV_LINKS.map((link, i) => {
+            const isActive = activeSection === link.id;
+            return (
+              <motion.div
+                key={link.id}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 + i * 0.1, duration: 0.6 }}
               >
-                {({ isActive }) => (
-                  <>
-                    {link.name}
-                    {isActive && (
-                      <motion.div
-                        layoutId="active-nav"
-                        className="absolute -bottom-1 left-0 right-0 h-[1.5px] bg-gold/60"
-                        transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-                      />
-                    )}
-                    {!isActive && (
-                      <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-glass-creme-text/30 group-hover:w-full transition-all duration-500" />
-                    )}
-                  </>
-                )}
-              </NavLink>
-            </motion.div>
-          ))}
+                <button
+                  onClick={() => scrollToSection(link.id)}
+                  className={cn(
+                    "relative py-2 text-[10px] font-sans font-semibold tracking-[0.2em] uppercase transition-all duration-500 group focus:outline-none",
+                    isActive ? "text-glass-creme-text" : "text-glass-ivory-text/40 hover:text-glass-creme-text/80"
+                  )}
+                >
+                  {link.name}
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-nav"
+                      className="absolute -bottom-1 left-0 right-0 h-[1.5px] bg-gold/60"
+                      transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                    />
+                  )}
+                  {!isActive && (
+                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-glass-creme-text/30 group-hover:w-full transition-all duration-500" />
+                  )}
+                </button>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </motion.nav>

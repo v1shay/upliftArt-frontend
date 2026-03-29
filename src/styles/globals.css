@@ -14,6 +14,19 @@
   --color-glass-creme: rgba(255, 243, 222, 0.2);
   --color-glass-creme-text: #fdf5e6;
   --color-glass-ivory-text: #fffdfa;
+
+  --animate-marquee-left: marquee-left var(--animation-duration, 40s) linear infinite;
+  --animate-marquee-right: marquee-right var(--animation-duration, 40s) linear infinite;
+
+  @keyframes marquee-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes marquee-right {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
+  }
 }
 
 @layer base {
@@ -62,4 +75,23 @@
   .frosted-nav {
     @apply border-b border-mahogany/5 bg-ivory/80 backdrop-blur-md;
   }
+}
+
+/* Shimmer loading animation for lazy images */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.img-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 253, 250, 0.04) 0%,
+    rgba(255, 243, 222, 0.08) 40%,
+    rgba(212, 175, 55, 0.06) 50%,
+    rgba(255, 243, 222, 0.08) 60%,
+    rgba(255, 253, 250, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import logo from '../assets/logo.png';
+import { Mission, Impact, Cards, Contact } from './BlankPages';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 25 },
@@ -17,15 +18,16 @@ export const Home: React.FC = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
   return (
-    <div className="flex flex-col w-full min-h-screen overflow-hidden">
-      <section className="relative flex flex-col items-center justify-center h-screen px-6 text-center">
+    <div className="flex flex-col w-full overflow-x-hidden">
+      {/* Hero Section */}
+      <section id="home" className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center">
         <motion.div style={{ scale: heroScale, opacity: heroOpacity }} className="relative z-10 flex flex-col items-center">
           <motion.img 
             src={logo} 
             alt="UpliftArt Foundation" 
-            className="w-full max-w-[850px] h-auto mb-16 drop-shadow-[0_0_80px_rgba(74,14,14,0.12)]"
-            initial={{ scale: 0.92, opacity: 0, filter: 'blur(8px)' }}
-            animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
+            className="w-full max-w-[850px] h-auto mb-16 drop-shadow-[0_0_80px_rgba(74,14,14,0.12)] transform-gpu"
+            initial={{ scale: 0.92, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 2.4, ease: [0.23, 1, 0.32, 1] }}
           />
 
@@ -47,11 +49,11 @@ export const Home: React.FC = () => {
               className="flex justify-center flex-wrap gap-12 md:gap-20 mt-4"
             >
               <div className="flex flex-col items-center">
-                <div className="text-4xl md:text-5xl font-serif text-glass-creme-text tracking-tight mb-3 font-light">2,500+</div>
+                <div className="text-4xl md:text-5xl font-serif text-glass-creme-text tracking-tight mb-3 font-light">5,000+</div>
                 <div className="text-[10px] md:text-[11px] font-sans font-bold tracking-[0.3em] uppercase text-glass-ivory-text/60 text-center leading-relaxed">Cards<br/>Created</div>
               </div>
               <div className="flex flex-col items-center">
-                <div className="text-4xl md:text-5xl font-serif text-glass-creme-text tracking-tight mb-3 font-light">8</div>
+                <div className="text-4xl md:text-5xl font-serif text-glass-creme-text tracking-tight mb-3 font-light">10+</div>
                 <div className="text-[10px] md:text-[11px] font-sans font-bold tracking-[0.3em] uppercase text-glass-ivory-text/60 text-center leading-relaxed">Partner<br/>Schools</div>
               </div>
               <div className="flex flex-col items-center">
@@ -77,6 +79,12 @@ export const Home: React.FC = () => {
           <span className="text-[8px] uppercase tracking-[0.5em] font-sans text-glass-ivory-text/25">Scroll</span>
         </motion.div>
       </section>
+
+      {/* Other Sections */}
+      <Mission />
+      <Cards />
+      <Impact />
+      <Contact />
     </div>
   );
 };

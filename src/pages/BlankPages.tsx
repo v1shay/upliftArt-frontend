@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 
@@ -35,11 +35,10 @@ const fadeIn = {
 };
 
 const scaleIn = {
-  hidden: { opacity: 0, scale: 0.96, filter: 'blur(4px)' },
+  hidden: { opacity: 0, scale: 0.98 },
   visible: (delay: number = 0) => ({
     opacity: 1,
     scale: 1,
-    filter: 'blur(0px)',
     transition: { duration: 1.6, delay, ease: [0.23, 1, 0.32, 1] as const },
   }),
 };
@@ -53,6 +52,48 @@ const slideIn = (direction: 'left' | 'right') => ({
   }),
 });
 
+/* ─── Lazy Image with Shimmer ───────────────────────────────── */
+
+const LazyImage: React.FC<{
+  src: string;
+  className?: string;
+  alt?: string;
+}> = ({ src, className, alt = "Foundation Visual" }) => {
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    // Check if already cached
+    if (imgRef.current?.complete && imgRef.current?.naturalWidth > 0) {
+      setLoaded(true);
+    }
+  }, []);
+
+  return (
+    <div className={cn("relative overflow-hidden", className)}>
+      {/* Shimmer placeholder — visible until image loads */}
+      <div
+        className={cn(
+          "absolute inset-0 img-shimmer rounded-[8px] transition-opacity duration-700",
+          loaded ? "opacity-0" : "opacity-100"
+        )}
+      />
+      <img
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={cn(
+          "w-full h-full object-cover transform-gpu transition-opacity duration-700",
+          loaded ? "opacity-100" : "opacity-0"
+        )}
+      />
+    </div>
+  );
+};
+
 /* ─── Shared Components ─────────────────────────────────────── */
 
 const LiquidGlassFrame: React.FC<{
@@ -63,19 +104,34 @@ const LiquidGlassFrame: React.FC<{
     whileHover={{ scale: 1.015, y: -4 }}
     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     className={cn(
-      "relative rounded-[8px] overflow-hidden border border-white/[0.08] bg-ivory/[0.06] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] backdrop-blur-sm group cursor-pointer",
+      "relative rounded-[8px] overflow-hidden border border-white/[0.08] bg-ivory/[0.06] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] backdrop-blur-sm group cursor-pointer transform-gpu will-change-transform",
       className
     )}
   >
-    <img
+    <LazyImage
       src={src}
-      className="w-full h-full object-cover transition-all duration-[1.2s] ease-out group-hover:scale-[1.04] group-hover:grayscale-0 grayscale-[15%]"
-      alt="Foundation Visual"
+      className="w-full h-full group-hover:scale-[1.04] group-hover:grayscale-0 grayscale-[15%] transition-transform duration-[1.2s] ease-out"
     />
     {/* Liquid glass tint */}
     <div className="absolute inset-0 bg-gradient-to-tr from-ivory/[0.08] via-transparent to-ivory/[0.04] pointer-events-none mix-blend-overlay" />
     <div className="absolute inset-0 bg-ivory/[0.03] pointer-events-none" />
   </motion.div>
+);
+
+/* ─── Lightweight Gallery Card (no blur/overlay cost) ────────── */
+
+const GalleryCard: React.FC<{
+  src: string;
+  className?: string;
+}> = ({ src, className }) => (
+  <div
+    className={cn(
+      "relative rounded-[8px] overflow-hidden border border-white/[0.08] bg-black/20 transform-gpu flex-shrink-0",
+      className
+    )}
+  >
+    <LazyImage src={src} className="w-full h-full" />
+  </div>
 );
 
 const SectionContainer: React.FC<{ children: React.ReactNode; isFullWidth?: boolean }> = ({ children, isFullWidth }) => (
@@ -84,7 +140,7 @@ const SectionContainer: React.FC<{ children: React.ReactNode; isFullWidth?: bool
   </div>
 );
 
-/* ─── Glass Marquee (Gallery) ───────────────────────────────── */
+/* ─── Glass Marquee (Gallery) — pauses off-screen ───────────── */
 
 const GlassMarquee: React.FC<{
   images: string[];
@@ -92,29 +148,44 @@ const GlassMarquee: React.FC<{
   speed?: number;
   height?: string;
 }> = ({ images, direction = 'left', speed = 40, height = "h-[450px]" }) => {
-  const totalImages = [...images, ...images, ...images];
+  const totalImages = [...images, ...images];
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: '200px 0px' } // Start slightly before visible
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="relative flex overflow-hidden">
-      <motion.div
-        animate={{
-          x: direction === 'left' ? ['0%', '-33.33%'] : ['-33.33%', '0%'],
+    <div ref={containerRef} className="relative flex overflow-hidden select-none">
+      <div
+        className={cn(
+          "flex gap-6 py-3 px-3 transform-gpu",
+          direction === 'left' ? "animate-marquee-left" : "animate-marquee-right"
+        )}
+        style={{
+          animationDuration: `${speed}s`,
+          animationPlayState: isVisible ? 'running' : 'paused',
+          willChange: isVisible ? 'transform' : 'auto',
         }}
-        transition={{
-          duration: speed,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
-        className="flex gap-6 whitespace-nowrap py-3 px-3"
       >
         {totalImages.map((src, i) => (
-          <LiquidGlassFrame
+          <GalleryCard
             key={i}
             src={src}
-            className={cn("w-[420px] flex-shrink-0", height)}
+            className={cn("w-[420px]", height)}
           />
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -122,18 +193,19 @@ const GlassMarquee: React.FC<{
 /* ─── MISSION ───────────────────────────────────────────────── */
 
 export const Mission = () => (
-  <SectionContainer>
+  <section id="mission">
+    <SectionContainer>
     <div className="flex flex-col gap-32">
       {[
         {
           img: img1308,
           title: "It starts at a table.",
-          desc: "Students from eight Bay Area schools sit together — markers, watercolors, and cotton paper spread between them. No curriculum. No rubric. Just the quiet work of making something for someone they've never met.",
+          desc: "Students from 10+ Bay Area schools sit together — markers, watercolors, and cotton paper spread between them. No curriculum. No rubric. Just the quiet work of making something for someone they've never met.",
         },
         {
           img: img1326,
           title: "Every card is singular.",
-          desc: "We don't produce cards. Students create them — individually, by hand, with materials funded by community donations. Over 2,500 have been made so far. Each one is different. That's the point.",
+          desc: "We don't produce cards. Students create them — individually, by hand, with materials funded by community donations. Over 5,000+ have been made so far. Each one is different. That's the point.",
         },
         {
           img: img1327,
@@ -188,23 +260,25 @@ export const Mission = () => (
         </motion.div>
       ))}
     </div>
-  </SectionContainer>
+    </SectionContainer>
+  </section>
 );
 
 /* ─── IMPACT ────────────────────────────────────────────────── */
 
 export const Impact = () => (
-  <SectionContainer>
+  <section id="impact">
+    <SectionContainer>
     <div className="flex flex-col gap-16 pt-12">
       {[
         {
           img: img1328,
           title: "Bay Area, outward.",
-          desc: "Our chapters span eight schools across the region. Students bring friends — it's that kind of atmosphere. Every session is open, social, and intentionally low-pressure.",
+          desc: "Our chapters span 10+ schools across the region. Students bring friends — it's that kind of atmosphere. Every session is open, social, and intentionally low-pressure.",
         },
         {
           img: img2925,
-          title: "2,500 and counting.",
+          title: "5,000+ and counting.",
           desc: "Not a target — a tally. Each card represents one student choosing to spend time on someone else. We provide all supplies. They provide the rest.",
         },
         {
@@ -258,7 +332,8 @@ export const Impact = () => (
         </motion.div>
       ))}
     </div>
-  </SectionContainer>
+    </SectionContainer>
+  </section>
 );
 
 /* ─── CARDS (Gallery) ───────────────────────────────────────── */
@@ -269,20 +344,22 @@ export const Cards = () => {
   const imagesRow3 = [img4559, img1308, img4563, img1326, img1327];
 
   return (
-    <SectionContainer isFullWidth>
+    <section id="cards">
+      <SectionContainer isFullWidth>
       <div className="flex flex-col gap-3">
         <GlassMarquee images={imagesRow1} direction="left" speed={55} height="h-[520px]" />
         <GlassMarquee images={imagesRow2} direction="right" speed={75} height="h-[340px]" />
         <GlassMarquee images={imagesRow3} direction="left" speed={65} height="h-[380px]" />
       </div>
-    </SectionContainer>
+      </SectionContainer>
+    </section>
   );
 };
 
 /* ─── CONTACT ───────────────────────────────────────────────── */
 
 export const Contact = () => (
-  <div className="min-h-screen pt-32 px-6 max-w-7xl mx-auto">
+  <section id="contact" className="min-h-screen pt-32 px-6 max-w-7xl mx-auto">
     <div className="flex flex-col lg:flex-row gap-20 items-stretch min-h-[700px]">
       {/* Left: Photo */}
       <motion.div
@@ -357,5 +434,5 @@ export const Contact = () => (
         </motion.div>
       </motion.div>
     </div>
-  </div>
+  </section>
 );
