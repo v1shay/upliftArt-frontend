@@ -1,82 +1,173 @@
-import React from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import logo from '../assets/logo.png';
 import { Mission, Impact, Cards, Contact } from './BlankPages';
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 25 },
+  hidden: { opacity: 0, y: 40, rotateX: 15 },
   visible: (delay: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 1.6, delay, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
+    rotateX: 0,
+    transition: { duration: 1.8, delay, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
   }),
 };
 
+/* ─── Floating Particle ─────────────────────────────────────── */
+
+const FloatingParticle: React.FC<{
+  size: number;
+  x: string;
+  y: string;
+  delay: number;
+  duration?: number;
+}> = ({ size, x, y, delay, duration = 6 }) => (
+  <motion.div
+    className="absolute rounded-full bg-gold/20 pointer-events-none"
+    style={{ width: size, height: size, left: x, top: y }}
+    animate={{
+      y: [-20, 20, -20],
+      x: [-10, 10, -10],
+      scale: [1, 1.3, 1],
+      opacity: [0.15, 0.4, 0.15],
+    }}
+    transition={{
+      duration,
+      delay,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    }}
+  />
+);
+
+/* ─── Stat Counter with 3D Flip ─────────────────────────────── */
+
+const StatItem: React.FC<{
+  value: string;
+  label: string;
+  delay: number;
+}> = ({ value, label, delay }) => (
+  <motion.div
+    className="flex flex-col items-center perspective-scene"
+    initial={{ opacity: 0, rotateX: 90 }}
+    animate={{ opacity: 1, rotateX: 0 }}
+    transition={{ duration: 1.4, delay, ease: [0.23, 1, 0.32, 1] }}
+  >
+    <div className="text-4xl md:text-5xl font-serif text-glass-creme-text tracking-tight mb-3 font-light glow-pulse">
+      {value}
+    </div>
+    <div
+      className="text-[10px] md:text-[11px] font-sans font-bold tracking-[0.3em] uppercase text-glass-ivory-text/60 text-center leading-relaxed"
+      dangerouslySetInnerHTML={{ __html: label }}
+    />
+  </motion.div>
+);
+
 export const Home: React.FC = () => {
-  const { scrollYProgress } = useScroll();
-  const heroScale = useTransform(scrollYProgress, [0, 0.4], [1, 1.05]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+
+  // Smooth spring-dampened scroll values
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  // Parallax layers at different depths
+  const logoY = useTransform(smoothProgress, [0, 1], [0, -120]);
+  const logoZ = useTransform(smoothProgress, [0, 1], [0, -200]);
+  const logoRotateX = useTransform(smoothProgress, [0, 1], [0, 15]);
+  const logoScale = useTransform(smoothProgress, [0, 1], [1, 0.85]);
+  const heroOpacity = useTransform(smoothProgress, [0, 0.6], [1, 0]);
+
+  const titleY = useTransform(smoothProgress, [0, 1], [0, -60]);
+  const titleRotateX = useTransform(smoothProgress, [0, 1], [0, 10]);
+  
+  const statsY = useTransform(smoothProgress, [0, 1], [0, -30]);
+  const statsRotateX = useTransform(smoothProgress, [0, 1], [0, 8]);
+
+  const scrollIndicatorOpacity = useTransform(smoothProgress, [0, 0.15], [1, 0]);
 
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
-      {/* Hero Section */}
-      <section id="home" className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center">
-        <motion.div style={{ scale: heroScale, opacity: heroOpacity }} className="relative z-10 flex flex-col items-center">
-          <motion.img 
-            src={logo} 
-            alt="UpliftArt Foundation" 
-            className="w-full max-w-[850px] h-auto mb-16 drop-shadow-[0_0_80px_rgba(74,14,14,0.12)] transform-gpu"
-            initial={{ scale: 0.92, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 2.4, ease: [0.23, 1, 0.32, 1] }}
-          />
+      {/* Hero Section — 3D Parallax */}
+      <section
+        ref={heroRef}
+        id="home"
+        className="relative flex flex-col items-center justify-center min-h-[110vh] px-6 text-center perspective-scene overflow-hidden"
+      >
+        {/* Floating particles for depth */}
+        <FloatingParticle size={4} x="15%" y="20%" delay={0} duration={7} />
+        <FloatingParticle size={6} x="80%" y="30%" delay={1.5} duration={9} />
+        <FloatingParticle size={3} x="25%" y="70%" delay={3} duration={6} />
+        <FloatingParticle size={5} x="70%" y="60%" delay={2} duration={8} />
+        <FloatingParticle size={3} x="50%" y="15%" delay={4} duration={10} />
+        <FloatingParticle size={4} x="90%" y="75%" delay={1} duration={7.5} />
 
-          <motion.div className="flex flex-col items-center">
-            <motion.h1
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={1.0}
-              className="mb-6 text-3xl md:text-5xl font-serif italic tracking-[0.15em] text-glass-creme-text drop-shadow-[0_0_20px_rgba(255,243,222,0.25)] text-balance"
-            >
-              Creativity that Cares
-            </motion.h1>
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={1.4}
-              className="flex justify-center flex-wrap gap-12 md:gap-20 mt-4"
-            >
-              <div className="flex flex-col items-center">
-                <div className="text-4xl md:text-5xl font-serif text-glass-creme-text tracking-tight mb-3 font-light">5,000+</div>
-                <div className="text-[10px] md:text-[11px] font-sans font-bold tracking-[0.3em] uppercase text-glass-ivory-text/60 text-center leading-relaxed">Cards<br/>Created</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="text-4xl md:text-5xl font-serif text-glass-creme-text tracking-tight mb-3 font-light">10+</div>
-                <div className="text-[10px] md:text-[11px] font-sans font-bold tracking-[0.3em] uppercase text-glass-ivory-text/60 text-center leading-relaxed">Partner<br/>Schools</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="text-4xl md:text-5xl font-serif text-glass-creme-text tracking-tight mb-3 font-light">CHFK</div>
-                <div className="text-[10px] md:text-[11px] font-sans font-bold tracking-[0.3em] uppercase text-glass-ivory-text/60 text-center leading-relaxed">National<br/>Partner</div>
-              </div>
-            </motion.div>
-          </motion.div>
+        {/* Logo — deepest parallax layer */}
+        <motion.div
+          style={{
+            y: logoY,
+            rotateX: logoRotateX,
+            scale: logoScale,
+            opacity: heroOpacity,
+            translateZ: logoZ,
+          }}
+          className="relative z-10 flex flex-col items-center transform-gpu preserve-3d"
+        >
+          <motion.img
+            src={logo}
+            alt="UpliftArt Foundation"
+            className="w-full max-w-[850px] h-auto mb-16 drop-shadow-[0_0_80px_rgba(74,14,14,0.12)] transform-gpu"
+            initial={{ scale: 0.85, opacity: 0, rotateY: -8 }}
+            animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+            transition={{ duration: 2.8, ease: [0.23, 1, 0.32, 1] }}
+          />
+        </motion.div>
+
+        {/* Title — mid parallax layer */}
+        <motion.div
+          style={{ y: titleY, rotateX: titleRotateX, opacity: heroOpacity }}
+          className="relative z-10 flex flex-col items-center transform-gpu preserve-3d"
+        >
+          <motion.h1
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={1.0}
+            className="mb-6 text-3xl md:text-5xl font-serif italic tracking-[0.15em] text-glass-creme-text drop-shadow-[0_0_20px_rgba(255,243,222,0.25)] text-balance"
+          >
+            Creativity that Cares
+          </motion.h1>
+        </motion.div>
+
+        {/* Stats — shallowest parallax layer */}
+        <motion.div
+          style={{ y: statsY, rotateX: statsRotateX, opacity: heroOpacity }}
+          className="relative z-10 flex justify-center flex-wrap gap-12 md:gap-20 mt-4 transform-gpu preserve-3d"
+        >
+          <StatItem value="5,000+" label="Cards<br/>Created" delay={1.4} />
+          <StatItem value="10+" label="Partner<br/>Schools" delay={1.6} />
+          <StatItem value="CHFK" label="National<br/>Partner" delay={1.8} />
         </motion.div>
 
         {/* Scroll Indicator */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 3, duration: 2.5 }}
-          className="absolute bottom-16 flex flex-col items-center gap-4"
+          style={{ opacity: scrollIndicatorOpacity }}
+          className="absolute bottom-16 flex flex-col items-center gap-4 z-10"
         >
           <motion.div
-            animate={{ y: [0, 8, 0] }}
+            animate={{ y: [0, 12, 0], rotateX: [0, 5, 0] }}
             transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-            className="w-px h-16 bg-gradient-to-b from-glass-ivory-text/20 to-transparent"
+            className="w-px h-20 bg-gradient-to-b from-glass-ivory-text/30 to-transparent"
           />
-          <span className="text-[8px] uppercase tracking-[0.5em] font-sans text-glass-ivory-text/25">Scroll</span>
+          <motion.span
+            animate={{ opacity: [0.2, 0.5, 0.2] }}
+            transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+            className="text-[8px] uppercase tracking-[0.5em] font-sans text-glass-ivory-text/25"
+          >
+            Scroll
+          </motion.span>
         </motion.div>
       </section>
 

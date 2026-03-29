@@ -19,13 +19,13 @@
   --animate-marquee-right: marquee-right var(--animation-duration, 40s) linear infinite;
 
   @keyframes marquee-left {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
   }
 
   @keyframes marquee-right {
-    from { transform: translateX(-50%); }
-    to { transform: translateX(0); }
+    from { transform: translate3d(-50%, 0, 0); }
+    to { transform: translate3d(0, 0, 0); }
   }
 }
 
@@ -51,7 +51,6 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Soft paper-like texture overlay */
     background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
   }
 
@@ -75,6 +74,15 @@
   .frosted-nav {
     @apply border-b border-mahogany/5 bg-ivory/80 backdrop-blur-md;
   }
+
+  .perspective-scene {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
 }
 
 /* Shimmer loading animation for lazy images */
@@ -94,4 +102,32 @@
   );
   background-size: 200% 100%;
   animation: shimmer 2s ease-in-out infinite;
+}
+
+/* 3D floating animation */
+@keyframes float-3d {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg); }
+  25% { transform: translate3d(0, -8px, 20px) rotateX(1deg) rotateY(-0.5deg); }
+  50% { transform: translate3d(0, -4px, 10px) rotateX(0deg) rotateY(0.5deg); }
+  75% { transform: translate3d(0, -10px, 15px) rotateX(-0.5deg) rotateY(0deg); }
+}
+
+.float-3d {
+  animation: float-3d 8s ease-in-out infinite;
+}
+
+/* Glow pulse for stats */
+@keyframes glow-pulse {
+  0%, 100% { text-shadow: 0 0 20px rgba(255,243,222,0.15); }
+  50% { text-shadow: 0 0 40px rgba(255,243,222,0.35), 0 0 80px rgba(212,175,55,0.1); }
+}
+
+.glow-pulse {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* Particle drift for decorative elements */
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.3; }
+  50% { transform: translate3d(20px, -30px, 40px) rotate(180deg); opacity: 0.6; }
 }

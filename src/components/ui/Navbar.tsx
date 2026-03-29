@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import logo from '../../assets/logo.png';
 
@@ -13,6 +13,8 @@ const NAV_LINKS = [
 
 export const Navbar: React.FC = () => {
   const [activeSection, setActiveSection] = useState('home');
+  const { scrollY } = useScroll();
+  const navBg = useTransform(scrollY, [0, 100], [0, 1]);
 
   useEffect(() => {
     let ticking = false;
@@ -55,13 +57,14 @@ export const Navbar: React.FC = () => {
 
   return (
     <motion.nav
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 1.4, ease: [0.23, 1, 0.32, 1] }}
-      className="fixed top-0 left-0 right-0 z-[100] border-b border-white/[0.06] bg-ivory/[0.08] backdrop-blur-2xl backdrop-saturate-150 shadow-[0_4px_30px_rgba(0,0,0,0.08)]"
+      initial={{ y: -100, opacity: 0, rotateX: -15 }}
+      animate={{ y: 0, opacity: 1, rotateX: 0 }}
+      transition={{ duration: 1.6, ease: [0.23, 1, 0.32, 1] }}
+      className="fixed top-0 left-0 right-0 z-[100] border-b border-white/[0.06] bg-ivory/[0.08] backdrop-blur-2xl backdrop-saturate-150 shadow-[0_4px_30px_rgba(0,0,0,0.08)] transform-gpu"
+      style={{ perspective: '800px' }}
     >
       <div className="flex items-center justify-between h-20 px-12 max-w-7xl mx-auto">
-        {/* Logo */}
+        {/* Logo with 3D hover */}
         <button 
           onClick={() => scrollToSection('home')}
           className="flex items-center gap-3 group focus:outline-none"
@@ -69,8 +72,8 @@ export const Navbar: React.FC = () => {
           <motion.img
             src={logo}
             alt="UpliftArt"
-            className="w-8 h-8 opacity-90 group-hover:opacity-100 transition-all duration-500"
-            whileHover={{ scale: 1.08 }}
+            className="w-8 h-8 opacity-90 group-hover:opacity-100 transition-all duration-500 transform-gpu"
+            whileHover={{ scale: 1.15, rotateY: 15, rotateX: -5 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
           />
           <span className="text-[10px] font-sans font-semibold tracking-[0.3em] uppercase text-glass-creme-text/70 group-hover:text-glass-creme-text transition-colors duration-500 hidden sm:block text-left">
@@ -85,14 +88,17 @@ export const Navbar: React.FC = () => {
             return (
               <motion.div
                 key={link.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 + i * 0.1, duration: 0.6 }}
+                initial={{ opacity: 0, y: -20, rotateX: -30 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ delay: 0.8 + i * 0.12, duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
               >
-                <button
+                <motion.button
                   onClick={() => scrollToSection(link.id)}
+                  whileHover={{ scale: 1.1, y: -2, rotateX: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                   className={cn(
-                    "relative py-2 text-[10px] font-sans font-semibold tracking-[0.2em] uppercase transition-all duration-500 group focus:outline-none",
+                    "relative py-2 text-[10px] font-sans font-semibold tracking-[0.2em] uppercase transition-colors duration-500 group focus:outline-none transform-gpu",
                     isActive ? "text-glass-creme-text" : "text-glass-ivory-text/40 hover:text-glass-creme-text/80"
                   )}
                 >
@@ -107,7 +113,7 @@ export const Navbar: React.FC = () => {
                   {!isActive && (
                     <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-glass-creme-text/30 group-hover:w-full transition-all duration-500" />
                   )}
-                </button>
+                </motion.button>
               </motion.div>
             );
           })}
