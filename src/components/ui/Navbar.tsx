@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import logo from '../../assets/logo.png';
 
@@ -13,8 +13,6 @@ const NAV_LINKS = [
 
 export const Navbar: React.FC = () => {
   const [activeSection, setActiveSection] = useState('home');
-  const { scrollY } = useScroll();
-  const navBg = useTransform(scrollY, [0, 100], [0, 1]);
 
   useEffect(() => {
     let ticking = false;
