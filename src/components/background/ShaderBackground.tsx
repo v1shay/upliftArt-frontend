@@ -15,7 +15,7 @@ export const ShaderBackground: React.FC = () => {
             pointerEvents: 'none',
           }}
           fov={45}
-          pixelDensity={1}
+          pixelDensity={0.8} // Optimized for performance while scrolling
         >
           <ShaderGradient
             animate="on"
@@ -23,7 +23,7 @@ export const ShaderBackground: React.FC = () => {
             cAzimuthAngle={0}
             cDistance={4}
             cPolarAngle={110}
-            cameraZoom={1} // Zoomed to fill the entire frame
+            cameraZoom={1}
             color1="#d9d4cc"
             color2="#c4b7a6"
             color3="#beb5a8"
@@ -34,12 +34,12 @@ export const ShaderBackground: React.FC = () => {
             rotationY={0}
             rotationZ={0}
             shader="defaults"
-            type="plane" // Switched to plane to prevent geometry cutoffs in corners
+            type="plane"
             uAmplitude={1.2}
             uDensity={1.2}
             uFrequency={5.5}
-            uSpeed={0.12}
-            uStrength={1.8}
+            uSpeed={0.25} // Faster movement for more visibility
+            uStrength={2.4} // More visible liquid transitions
             uTime={0}
           />
         </ShaderGradientCanvas>

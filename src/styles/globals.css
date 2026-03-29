@@ -94,11 +94,11 @@
 .img-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(255, 253, 250, 0.04) 0%,
-    rgba(255, 243, 222, 0.08) 40%,
+    rgba(255, 253, 250, 0.12) 0%,
+    rgba(255, 243, 222, 0.20) 40%,
     rgba(212, 175, 55, 0.06) 50%,
-    rgba(255, 243, 222, 0.08) 60%,
-    rgba(255, 253, 250, 0.04) 100%
+    rgba(255, 243, 222, 0.20) 60%,
+    rgba(255, 253, 250, 0.12) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 2s ease-in-out infinite;
