@@ -15,7 +15,7 @@ export const ShaderBackground: React.FC = () => {
             pointerEvents: 'none',
           }}
           fov={45}
-          pixelDensity={0.8} // Optimized for performance while scrolling
+          pixelDensity={1} // Reset to original full quality
         >
           <ShaderGradient
             animate="on"
@@ -38,8 +38,8 @@ export const ShaderBackground: React.FC = () => {
             uAmplitude={1.2}
             uDensity={1.2}
             uFrequency={5.5}
-            uSpeed={0.25} // Faster movement for more visibility
-            uStrength={2.4} // More visible liquid transitions
+            uSpeed={0.25}
+            uStrength={2.4}
             uTime={0}
           />
         </ShaderGradientCanvas>

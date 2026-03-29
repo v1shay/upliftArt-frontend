@@ -4,9 +4,9 @@ import logo from '../assets/image.png';
 import { Mission, Impact, Cards, Contact } from './BlankPages';
 
 // Partner Logos
-import school1 from '../assets/logos/image.png';
+import school1 from '../assets/logos/image copy 2.png';
 import school2 from '../assets/logos/download-removebg-preview (1).png';
-import school3 from '../assets/logos/download-removebg-preview.png';
+import school3 from '../assets/logos/image copy 4.png';
 import school4 from '../assets/logos/download__1_-removebg-preview.png';
 import school5 from '../assets/logos/download__2_-removebg-preview.png';
 import school6 from '../assets/logos/image copy.png';
